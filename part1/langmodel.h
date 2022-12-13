@@ -13,16 +13,10 @@ class langmodel
         int k;
         int alfa;
         std::map<std::string,std::map<char,int>> probs = {};
-        std::string temp;
-        std::vector<std::string> symbols;
-        std::vector<char> alphabet = {};
-        std::map<std::string,std::map<char,int>>::iterator outer;
         std::map<char,int> tempmap;
-        std::map<char,int>::iterator inner;
+        std::string buffer;
     public:
-        langmodel(int k_in, int alfa_in,const char *file)
-        {
-            std::string buffer;
+        langmodel(int k_in, int alfa_in,const char *file) {
             k = k_in;
             alfa = alfa_in;
             std::ifstream fw(file, std::ifstream::in);
@@ -32,11 +26,10 @@ class langmodel
                 getline(fw,buffer);
                 if(buffer != "")
                 {
-                    char point = buffer[k_in];
-                    std::string con_s = buffer.substr(k+1, buffer.size()-k+1);
-                    int count = stoi(con_s);
-                    std::cout << con_s << "\n"; 
-                    //tempmap.insert(std::pair<char,int>(point,count));
+                    char point = buffer[k];
+                    int count = stoi(buffer.substr(k+1, buffer.size()-k+1));
+                    tempmap.insert(std::pair<char,int>(point,count));
+                    probs.insert(std::pair<std::string,std::map<char,int>>(buffer.substr(0,k),tempmap));
                 }
             }
         }
