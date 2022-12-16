@@ -9,3 +9,7 @@ germarnes - https://www.gutenberg.org/files/41277/41277-0.txt
 verwandlung - https://www.gutenberg.org/cache/epub/22367/pg22367.txt
 
 zadig - https://www.gutenberg.org/cache/epub/4647/pg4647.txt
+
+mobydick - https://www.gutenberg.org/files/2701/2701-0.txt
+
+holmes - https://www.gutenberg.org/files/1661/1661-0.txt
