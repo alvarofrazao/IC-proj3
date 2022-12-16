@@ -14,6 +14,6 @@ SET (BASE_DIR ${CMAKE_SOURCE_DIR} )
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/../part2-bin)
 
 
-add_executable (encoder encoder.cpp)
-target_link_libraries (encoder ${OpenCV_LIBS})
+add_executable (lang lang.cpp)
+target_link_libraries (lang)
 
