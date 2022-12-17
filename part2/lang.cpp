@@ -11,18 +11,18 @@ using namespace std;
 int main(int argc, char *argv[]) {
     
     if ((int)argc < 3) {
-        cerr << "Usage: " << argv[0] << " <input txt file> <model txt file>\n";
+        cerr << "Usage: " << argv[0] << " <input txt file> <model txt file> <model k>\n";
         return -1;
     }
 
-    int k = 5;
+    int k = stoi(argv[argc-1]);
     string buffer, temp, line, prob_str;
-    ifstream infile(argv[argc-2]);
+    ifstream infile(argv[argc-3]);
     ifstream model;
 
     char c;
     int nbits = 0;
-    double prob;
+
 
     for(int i = 0 ; i < k+1 ; i++) {
         infile.get(c);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
             buffer[k] = c; 
         else
             buffer[k] = '|';
-        model.open(argv[argc-1]);
+        model.open(argv[argc-2]);
         while(getline(model,line)) {
             temp.clear();
             for(int i = 0 ; i < k+1 ; i++)

@@ -31,6 +31,6 @@ class langmodel
                     tempmap.insert(std::pair<char,int>(point,count));
                     probs.insert(std::pair<std::string,std::map<char,int>>(buffer.substr(0,k),tempmap));
                 }
-            }
+            }0
         }
 };
