@@ -65,6 +65,6 @@ int main(int argc, char *argv[]) {
         }
         infile.close();
     }
-    cout << "The text is in "<< lingua.substr (16,size(lingua)-20)<< ".\n";
+    cout << "The text is in "<< lingua.substr (16,size(lingua)-26)<< ".\n";
 return 1;
 }
