@@ -18,3 +18,6 @@ target_link_libraries (lang)
 
 add_executable (findlang findlang.cpp)
 target_link_libraries (findlang)
+
+add_executable (locatelang locatelang.cpp)
+target_link_libraries (locatelang)
