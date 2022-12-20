@@ -16,18 +16,21 @@ int main(int argc, char *argv[]) {
         cerr << "Usage: " << argv[0] << " <input txt file> <model k>\n";
         return -1;
     }
-    double a = 1;
     int k = stoi(argv[argc-1]);
     string buffer, temp, line, prob_str, lingua;
-    double best = MAXFLOAT;
+    int it = 0;
+    vector<string> detect[10], temp_vec;
+    bool detect_flag = true;
 
     string path = "../part2/models";
     for (const auto & entry : fs::directory_iterator(path)){ 
 
+        lingua = entry.path();
+        lingua = lingua.substr (16,size(lingua)-26);
+
         char c;
-        double nbits = 0;
+        int nbits = 0;
         buffer= "";
-        bool flag;
         ifstream infile(argv[argc-2]);
         
         for(int i = 0 ; i < k+1 ; i++) {
@@ -37,16 +40,13 @@ int main(int argc, char *argv[]) {
             else
                 buffer.push_back('|');
         }
-        int corretas = 0, incorretas = 0;
         do{
             if( c != '\n')
                 buffer[k] = c; 
             else
                 buffer[k] = '|';
             ifstream model(entry.path());
-            getline(model,line);
-            double sigma = stod(line);
-            flag = false;
+            detect_flag = false;
             while(getline(model,line)) {
                 temp.clear();
                 for(int i = 0 ; i < k+1 ; i++)
@@ -56,27 +56,34 @@ int main(int argc, char *argv[]) {
                     for(size_t i = k+1 ; i < size(line) ; i++)
                         prob_str.push_back(line[i]);
                     nbits = nbits - log2(stod(prob_str));
-                    flag = true;
-                    corretas++;
-                } 
+                    detect_flag = true;
+                }
             }
-            if(!flag) 
-                nbits = nbits - log2(a/(a*sigma));
-
             model.close();
-
+            if(detect_flag)
+                detect[it].push_back(lingua);
+            else {
+                nbits = nbits - log2(stod(prob_str));
+                detect[it].push_back("");
+            }
             for(size_t i  = 0 ; i < size(buffer) ; i++)
                 buffer[i] = buffer[i+1];
 
             infile.get(c);
-
         }while(!infile.eof());
-        if ( nbits < best){
-            best = nbits;
-            lingua= entry.path();
-        }
         infile.close();
+        int counter = 0;
+        for(size_t j = 1; j < size(detect[it])+1 ; j++){
+            if(detect[it][j-1] == lingua)
+                counter++;
+            else
+                counter = 0;
+            if (counter == k*2) {
+                cout << lingua << " was detected stating in " << j-k*2 << "º character\n";
+                break;
+            }
+        }
+        it++;
     }
-    cout << "The text is in "<< lingua.substr (16,size(lingua)-26)<< ".\n";
 return 1;
 }
