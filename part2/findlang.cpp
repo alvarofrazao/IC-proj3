@@ -37,7 +37,6 @@ int main(int argc, char *argv[]) {
             else
                 buffer.push_back('|');
         }
-        int corretas = 0, incorretas = 0;
         do{
             if( c != '\n')
                 buffer[k] = c; 
@@ -57,7 +56,7 @@ int main(int argc, char *argv[]) {
                         prob_str.push_back(line[i]);
                     nbits = nbits - log2(stod(prob_str));
                     flag = true;
-                    corretas++;
+                    break;
                 } 
             }
             if(!flag) 
