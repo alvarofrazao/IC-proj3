@@ -5,117 +5,109 @@
 #include "math.h"
 #include <fstream>
 #include <algorithm> // std::find
+#include <cstddef>
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    if ((int)argc < 2)
+    if ((int)argc < 4)
     {
-        cerr << "Usage: " << argv[0] << " <input txt file>\n";
+        cerr << "Usage: " << argv[0] << " <input txt file> <k> <a>\n";
         return 1;
     }
 
-    int k = 5;
-    int alfa = 1;
-    // int a = 1;
-    map<string, map<char, int>> probs = {};
-    string temp;
-    vector<string> symbols;
+    int k = stoi(argv[argc - 2]);
+    double alfa = stod(argv[argc - 1]);
+    vector<char> init = {'c','o','n','t','a'};
     vector<char> alphabet = {};
-    map<string, map<char, int>>::iterator outer;
-    map<char, int> tempmap;
-    map<char, int>::iterator inner;
-    char p = 'o';
-    string file_name = argv[argc - 1];
+
+
+    map<char,double>::iterator inner;
+    map<string,map<char,double>>::iterator outer;
+    map<char,double> tempmap;
+    map<string,map<char,double>> prob = {};
+
+    string buffer;
+    int j = 0;
+    for (int i = 0; i < k; i++)
+    {
+        if(j < 5)
+        {
+            buffer.push_back(init[j]);
+        }
+        else
+        {
+            j = 0;
+            buffer.push_back(init[j]);
+        }
+        j++;
+    }
+
+    string file_name = argv[argc - 3];
     fstream files;
     files.open(file_name, ios::in);
-    string m;
-    char r;
-    while (getline(files, m))
+    char storage;
+    string map_insert;
+    while(files.read(&storage,sizeof(char)))
     {
-        for (int s = 0; m[s + k] != '\0'; s++) // ultimos k characteres da string sao ignorados (ou os k-1? nao fiz as contas)
-        {
-            temp.clear();
-            tempmap.clear();
-            for (int i = 0; i < k; i++)
+            if(storage == '\n')
             {
-                r = m[s + i];
-                temp.push_back(r);
-                if (find(alphabet.begin(), alphabet.end(), m[s + i]) == alphabet.end())
-                {
-                    alphabet.push_back(r);
-                }
+                storage = '|';
             }
-            p = m[s + k];
-            outer = probs.find(temp);
-            if (outer == probs.end())
+            tempmap.clear();
+            map_insert.clear();
+            buffer.push_back(storage);
+
+            if (find(alphabet.begin(), alphabet.end(), storage) == alphabet.end())
             {
-                tempmap.insert(pair<char, int>(p, 1));
-                probs.insert(pair<string, map<char, int>>(temp, tempmap));
-                // se ele nao encontrar a string de k chars no mapa externo, ele cria logo uma entrada tanto no mapa interno como no externo
-                // ignorando assim o passo de procura pelo char
+                alphabet.push_back(storage);
+            }
+            
+            for(int j = 0; j < k; j++)
+            {
+                map_insert.push_back(buffer[j]);
+            }
+            
+            outer = prob.find(map_insert);
+            if (outer == prob.end())
+            {
+                tempmap.insert(pair<char, double>(storage, 1));
+                prob.insert(pair<string, map<char, double>>(map_insert, tempmap));
             }
             else
             {
-                inner = outer->second.find(p);
+                inner = outer->second.find(storage);
                 if (inner != outer->second.end())
                 {
                     inner->second++;
                 }
                 else
                 {
-                    outer->second.insert(pair<char, int>(p, 1));
+                    outer->second.insert(pair<char, double>(storage, 1));
                 }
-            }
-        }
+            } 
+            //rotate(buffer.begin(),buffer.begin()+1,buffer.end());
+            buffer.erase(buffer.begin());
     }
     files.close();
-    int sigma = (int)alphabet.size();
-
-    files.open(file_name.insert(file_name.length() - 4, "-class"), ios::out);
-    for (auto t : probs)
-    {
-        for (auto y : t.second)
-        {
-            files << t.first << y.first << y.second << '\n';
-        }
-    }
-    files.close();
-
-    double nbits = 0;
-    int n;
+    double sigma = alphabet.size(); // trocar alphabet
+    double n;
     double num;
     double den;
     double pp;
-    files.open(file_name, ios::in);
-    while (getline(files, m))
+    files.open(file_name.insert(file_name.length() - 4, "-model"), ios::out);
+    files << sigma << "\n";
+    for (auto t : prob)
     {
-        for (int s = 0; m[s + k] != '\0'; s++)
+        n = t.second.size();
+        for (auto y : t.second)
         {
-            temp.clear();
-            for (int i = 0; i < k; i++)
-            {
-                temp.push_back(m[s + i]);
-            }
-            p = m[s + k];
-            outer = probs.find(temp);
-            n = (int)outer->second.size();
-
-            if (outer != probs.end())
-            {
-                inner = outer->second.find(p);
-                if (inner != outer->second.end())
-                {
-                    num = alfa + inner->second;
-                    den = n + (alfa * sigma);
-                    pp = num / den;
-                    nbits = nbits - log2(pp); // nao sei se estes calculos tao bem
-                }
-            }
+            num = alfa + y.second;
+            den = n + (alfa * sigma);
+            pp = num/den;
+            files << t.first << y.first << pp << '\n';
         }
     }
     files.close();
-    cout << "string entropy = " << nbits << '\n';
-    cout << sigma << '\n';
     return 0;
 }

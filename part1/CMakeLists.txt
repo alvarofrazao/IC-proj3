@@ -17,6 +17,3 @@ SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/../part1-bin)
 add_executable (fcm fcm.cpp)
 target_link_libraries (fcm)
 
-add_executable (fcm_byte fcm_byte.cpp)
-target_link_libraries (fcm_byte)
-
