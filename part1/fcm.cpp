@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
             buffer.erase(buffer.begin());
     }
     files.close();
-    double sigma = alphabet.size(); // trocar alphabet
+    double sigma = prob.size(); // trocar alphabet
     double n;
     double num;
     double den;
