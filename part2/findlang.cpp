@@ -6,9 +6,11 @@
 #include <fstream>
 #include <algorithm>
 #include <filesystem>
+#include <chrono>
 namespace fs = std::filesystem;
 
 using namespace std;
+using namespace std::chrono;
 
 int main(int argc, char *argv[]) {
     
@@ -16,12 +18,13 @@ int main(int argc, char *argv[]) {
         cerr << "Usage: " << argv[0] << " <input txt file> <model k>\n";
         return -1;
     }
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
     double a = 1;
     int k = stoi(argv[argc-1]);
     string buffer, temp, line, prob_str, lingua;
     double best = MAXFLOAT;
 
-    string path = "../part2/models";
+    string path = "../part2/modelsk5";
     for (const auto & entry : fs::directory_iterator(path)){ 
 
         char c;
@@ -77,5 +80,9 @@ int main(int argc, char *argv[]) {
         infile.close();
     }
     cout << "The text is in "<< lingua.substr (16,size(lingua)-26)<< ".\n";
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    std::cout << "It took me " << time_span.count() << " seconds.";
+    std::cout << std::endl;
 return 1;
 }

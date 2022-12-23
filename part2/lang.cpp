@@ -5,8 +5,10 @@
 #include "math.h"
 #include <fstream>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 int main(int argc, char *argv[]) {
     
@@ -14,6 +16,8 @@ int main(int argc, char *argv[]) {
         cerr << "Usage: " << argv[0] << " <input txt file> <model txt file> <model k>\n";
         return -1;
     }
+
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
     int k = stoi(argv[argc-1]);
     int a = 1;
@@ -66,5 +70,9 @@ int main(int argc, char *argv[]) {
     }while(!infile.eof());
     cout << "File entropy = " << nbits << '\n';
     infile.close();
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    std::cout << "It took me " << time_span.count() << " seconds.";
+    std::cout << std::endl;
 return 1;
 }
