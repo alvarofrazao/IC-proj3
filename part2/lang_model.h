@@ -24,6 +24,8 @@ class lang_model
             std::map<char,double> temp;
             double probability;
             char c;
+            int line_c = 0;
+            std::vector<char> cars {'1','2','3','4','5','6','7','8','9','0','.'};
 
             language = file_path.substr(16,size(file_path)-26);
 
@@ -31,11 +33,13 @@ class lang_model
             a = alfa;
 
             getline(model_input,line);
-            sigma = stod(line);
+            sigma = stoi(line);
             missing_str = a/(a*sigma);
+            line_c++;
 
             while(getline(model_input,line))
             {
+                line_c++;
                 temp.clear();
                 buffer.clear();
                 prob_str.clear();
@@ -57,10 +61,16 @@ class lang_model
 
                 for(size_t i = k+1 ; i < size(line) ; i++)
                 {
-                    prob_str.push_back(line[i]);
+                    if((line[i] >= '0' && line[i] <= '9') || (line[i] == '.') )
+                    {
+                        prob_str.push_back(line[i]);
+                    }
                 }
-
-
+                //std::cout << '\n';
+                while((prob_str[0] < '0') || (prob_str[0] > '9'))
+                {
+                    prob_str.erase(prob_str.begin());
+                }
                 probability = stod(prob_str);
 
                 temp.insert(std::pair<char,double>(c,probability));
@@ -68,7 +78,7 @@ class lang_model
             }
         }
 
-        lang_model(std::string file_path, double alfa)
+        /*lang_model(std::string file_path, double alfa,std::string language_in)
         {
             std::ifstream model_input(file_path);
             std::string buffer,line,prob_str;
@@ -76,14 +86,16 @@ class lang_model
             double probability;
             char c;
 
-            language = file_path.substr(16,size(file_path)-26);
+            language = language_in;
 
             getline(model_input,line);
             k = stoi(line);
+            
             a = alfa;
-
+            int linenum = 0;
             getline(model_input,line);
-            sigma = stod(line);
+            sigma = stoi(line);
+            
             missing_str = a/(a*sigma);
 
             while(getline(model_input,line))
@@ -91,6 +103,8 @@ class lang_model
                 temp.clear();
                 buffer.clear();
                 prob_str.clear();
+                linenum++;
+
 
                 for(int i = 0 ; i < k ; i++)
                 {
@@ -110,15 +124,19 @@ class lang_model
                 for(size_t i = k+1 ; i < size(line) ; i++)
                 {
                     prob_str.push_back(line[i]);
+                    std::cout << line[i];
                 }
-
-
+                std::cout << '\n';
+                std::cout << "stodprob\n";
+                std::cout << linenum << '\n'; 
                 probability = stod(prob_str);
+                //std::cout << probability << '\n';
 
                 temp.insert(std::pair<char,double>(c,probability));
                 mdl.insert(std::pair<std::string,std::map<char,double>>(buffer,temp));
+                line.clear();
             }
-        }
+        }*/
 
         double model_find(std::string line)
         {

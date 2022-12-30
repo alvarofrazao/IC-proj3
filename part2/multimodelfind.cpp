@@ -15,7 +15,7 @@ using namespace std::chrono;
 
 int main(int argc, char *argv[])
 {
-    if ((int)argc < 2) 
+    if ((int)argc < 2)
     {
         cerr << "Usage: " << argv[0] << " <input txt file> <number of models used>\n";
         return -1;
@@ -24,38 +24,46 @@ int main(int argc, char *argv[])
     fstream files;
     files.open(argv[argc - 2], ios::in);
     vector<lang_model> models;
-    string path = "../part2/multikmodels";
+    string path = "../part2/multimodel";
     vector<char> init = {'a', 'e', 'i', 'o', 'u'};
 
-    double alfa = 1;
+    vector<double> alfa = {0.05, 0.75, 0.005};
+    vector<int> k = {4, 5, 2};
+    // std::cout << "intro1\n";
     int counter = 0;
-    int mdl_n= stoi(argv[argc-1]);
+    int mdl_n = stoi(argv[argc - 1]);
+    // std::cout << "intro2\n";
+    int g = 0;
 
     for (const auto &entry : fs::directory_iterator(path))
     {
-        if(counter < mdl_n)
+        // cout << "intro3\n";
+        /*if(counter < mdl_n)
         {
             break;
-        }
-        models.push_back(lang_model(entry.path(), alfa));
+        }*/
+        // cout << "intro4\n";
+        models.push_back(lang_model(entry.path(), k[g], alfa[g]));
         counter++;
+        g++;
     }
 
-    if(models.size()>(size_t)mdl_n)
+    if (models.size() > (size_t)mdl_n)
     {
         cerr << "Model list inconsistent with <number of models used>\n";
         return -1;
     }
 
     string buffer;
-    int model_idx = rand() % (int)models.size(); //first model; "randomly" chosen
-
+    int model_idx = rand() % (int)models.size(); // first model; "randomly" chosen
+    // cout << "intro5\n";
+    // cout << model_idx << '\n';
 
     int j = 0;
     int cur_k = models[model_idx].get_k();
+    // cout << cur_k << '\n';
     char storage = ' ';
     double prob;
-    double total = 0;
 
     for (int i = 0; i <= cur_k; i++)
     {
@@ -72,34 +80,42 @@ int main(int argc, char *argv[])
     }
 
     int low_size = models[model_idx].get_size();
-    pair<int,int> presence;
+    pair<int, int> presence;
+    // cout <<"here1\n";
 
-    while(!files.eof())
+    while (!files.eof())
     {
-        while((int)buffer.size() > cur_k-1)
+        // cout <<"here2\n";
+        while ((int)buffer.size() > cur_k - 1)
         {
             buffer.erase(buffer.begin());
+            // cout << '.';
         }
-
-        while((int)buffer.size() < cur_k-1)
+        // cout << '\n';
+        // cout <<"here3\n";
+        while ((int)buffer.size() < cur_k - 1)
         {
             files.read(&storage, sizeof(char));
             buffer.push_back(storage);
+            // cout << '-';
         }
 
+        // cout << '\n';
+        // cout <<"here4\n";
         files.read(&storage, sizeof(char));
         buffer.push_back(storage);
 
-        prob += models[model_idx].model_find(buffer);
+        prob -= log2(models[model_idx].model_find(buffer));
 
-        for(int j = 0; j < (int)models.size();j++)
+        for (int j = 0; j < (int)models.size(); j++)
         {
+            // cout << '_';
             presence = models[j].check_presence(buffer);
-            if(j != model_idx)
+            if (j != model_idx)
             {
-                if(presence.first)
+                if (presence.first)
                 {
-                    if((presence.second < low_size) || (models[model_idx].get_mstr() > models[j].get_mstr()))
+                    if ((presence.second < low_size) || (models[model_idx].get_mstr() > models[j].get_mstr()))
                     {
                         low_size = presence.second;
                         model_idx = j;
@@ -108,10 +124,40 @@ int main(int argc, char *argv[])
                 }
             }
         }
+        // cout << '\n';
         buffer.erase(buffer.begin());
     }
+    files.close();
+    files.open(argv[argc - 2], ios::in);
+    cout << "Number of bits needed: " << prob << '\n';
 
+    for (int o = 0; o < mdl_n; o++)
+    {
+        prob = 0;
+        while (!files.eof())
+        {
+            // cout <<"here2\n";
+            // cout << '\n';
+            // cout <<"here3\n";
+            while ((int)buffer.size() < models[o].get_k() - 1)
+            {
+                files.read(&storage, sizeof(char));
+                buffer.push_back(storage);
+                // cout << '-';
+            }
 
+            // cout << '\n';
+            // cout <<"here4\n";
+            files.read(&storage, sizeof(char));
+            buffer.push_back(storage);
+
+            prob -= log2(models[o].model_find(buffer));
+            // cout << '\n';
+            buffer.erase(buffer.begin());
+        }
+        cout << "Using only model " << o << ", " << prob << " bits are needed\n";
+        files.close();
+        files.open(argv[argc - 2], ios::in);
+    }
     return 0;
 }
-    
