@@ -15,7 +15,7 @@ using namespace std::chrono;
 int main(int argc, char *argv[]) {
     
     if ((int)argc < 3) {
-        cerr << "Usage: " << argv[0] << " <input txt file> <model k>\n";
+        cerr << "Usage: " << argv[0] << " <input txt file> <model k 3-5>\n";
         return -1;
     }
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
@@ -24,7 +24,8 @@ int main(int argc, char *argv[]) {
     string buffer, temp, line, prob_str, lingua;
     double best = MAXFLOAT;
 
-    string path = "../part2/modelsk5";
+    string path = "../part2/modelsk";
+    path.push_back((char)(k+48));
     for (const auto & entry : fs::directory_iterator(path)){ 
 
         char c;

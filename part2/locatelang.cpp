@@ -6,34 +6,37 @@
 #include <fstream>
 #include <algorithm>
 #include <filesystem>
+#include <chrono>
 namespace fs = std::filesystem;
 
 using namespace std;
+using namespace std::chrono;
 
 int main(int argc, char *argv[]) {
     
     if ((int)argc < 3) {
-        cerr << "Usage: " << argv[0] << " <input txt file> <model k>\n";
+        cerr << "Usage: " << argv[0] << " <input txt file> <model k 3-5>\n";
         return -1;
     }
-    int k = stoi(argv[argc-1]);
-    string buffer, temp, line, prob_str, language;
-    int it = 0;
-    vector<double> detect[10], detect_means[10];
-    vector<string> languages_list, detect_final,temp_vec;
-    bool detect_flag = true;
-    double mean;
 
-    string path = "../part2/models";
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
+    int k = stoi(argv[argc-1]);
+    string buffer, temp, line, prob_str, lingua;
+    int it = 0;
+    vector<string> detect[10], temp_vec;
+    bool detect_flag = true;
+
+    string path = "../part2/modelsk";
+    path.push_back((char)(k+48));
+
     for (const auto & entry : fs::directory_iterator(path)){ 
 
-        language = entry.path();
-        language = language.substr (16,size(language)-26);
-        languages_list.push_back(language);
+        lingua = entry.path();
+        lingua = lingua.substr (16,size(lingua)-26);
 
         char c;
-        double a = 1;
-        double nbits = 0;
+        int nbits = 0;
         buffer= "";
         ifstream infile(argv[argc-2]);
         
@@ -61,70 +64,38 @@ int main(int argc, char *argv[]) {
                     prob_str = "";
                     for(size_t i = k+1 ; i < size(line) ; i++)
                         prob_str.push_back(line[i]);
-                    nbits =  - log2(stod(prob_str));
                     detect_flag = true;
+                    break;
                 }
             }
             model.close();
-            if(!detect_flag)
-                nbits = - log2(a/(a*sigma));
-
-            detect[it].push_back(nbits);
+            if(detect_flag)
+                detect[it].push_back(lingua);
+            else {
+                detect[it].push_back("");
+            }
             for(size_t i  = 0 ; i < size(buffer) ; i++)
                 buffer[i] = buffer[i+1];
 
             infile.get(c);
         }while(!infile.eof());
-
-        for( size_t i = 0 ; i < size(detect[it])-k ; i++) {
-            mean = 0;
-            for(int n = 0; n < k; n++)
-                mean = mean + detect[it][i+n];
-            detect_means[it].push_back(mean/k);
-        }
-    
         infile.close();
+        int counter = 0;
+        for(size_t j = 1; j < size(detect[it])+1 ; j++){
+            if(detect[it][j-1] == lingua)
+                counter++;
+            else
+                counter = 0;
+            if (counter == k*3) {
+                cout << lingua << " was detected stating in " << j-k*3 << "º character\n";
+                break;
+            }
+        }
         it++;
-    };
-    double best;
-    int best_j;
-    for( int i = 0 ; i < size(detect_means[0]) ; i++){
-        best = MAXFLOAT;
-        for(int  j = 0; j< size(languages_list) ; j++){
-            if(detect_means[j][i]< best){
-                best_j = j;
-                best = detect_means[j][i];
-            }
-        }
-        detect_final.push_back(languages_list[best_j]);
     }
-    int o = 0;
-    int limit;
-    string last_language = "";
-    
-    for(int i = 0; i<size(detect_final) ; i++) {
-        temp_vec.push_back(detect_final[i]);
-        o++;
-
-        if( (o%10) == 0) {
-            limit = 0;
-            for(auto y: languages_list) {
-                if(count(temp_vec.begin(), temp_vec.end(), y) > limit) {
-                    limit = count(temp_vec.begin(), temp_vec.end(), y);
-                    language = y;
-                }
-                else if(count(temp_vec.begin(), temp_vec.end(), y) == limit){
-                    language = "Multiple languages ";
-                    break;
-                }
-            }
-            if(last_language != language) {
-                cout << language<< " detected in the "<< i-9<< "º"<<"\n";
-                last_language = language;
-            }
-            temp_vec.clear();
-        }
-    }
-
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    std::cout << "It took me " << time_span.count() << " seconds.";
+    std::cout << std::endl;
 return 1;
 }
