@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     double num;
     double den;
     double pp;
-    files.open(file_name.insert(file_name.length() - 4, "-model"), ios::out);
+    files.open(/*file_name.insert(file_name.length() - 4, "-model")*/"verne3-model.txt", ios::out);
     files << sigma << "\n";
     for (auto t : prob)
     {

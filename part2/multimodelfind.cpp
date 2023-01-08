@@ -22,13 +22,14 @@ int main(int argc, char *argv[])
     }
 
     fstream files;
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
     files.open(argv[argc - 2], ios::in);
     vector<lang_model> models;
     string path = "../part2/multimodel";
     vector<char> init = {'a', 'e', 'i', 'o', 'u'};
 
-    vector<double> alfa = {0.05, 0.75, 0.005};
-    vector<int> k = {4, 5, 2};
+    vector<double> alfa = /*{0.05, 0.75, 0.005} {0.05,0.05,0.05}*/ {0.3,1,0.005};
+    vector<int> k = /*{4, 5, 2}*/{4,2,5};
     // std::cout << "intro1\n";
     int counter = 0;
     int mdl_n = stoi(argv[argc - 1]);
@@ -129,10 +130,15 @@ int main(int argc, char *argv[])
     }
     files.close();
     files.open(argv[argc - 2], ios::in);
-    cout << "Number of bits needed: " << prob << '\n';
+    cout << "Number of bits needed for multimodel: " << prob << '\n';
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    std::cout << "Multimodel execution time: " << time_span.count() << " seconds";
+    std::cout << std::endl;
 
     for (int o = 0; o < mdl_n; o++)
     {
+        t1 = high_resolution_clock::now();
         prob = 0;
         while (!files.eof())
         {
@@ -158,6 +164,11 @@ int main(int argc, char *argv[])
         cout << "Using only model " << o << ", " << prob << " bits are needed\n";
         files.close();
         files.open(argv[argc - 2], ios::in);
+        t2 = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+        std::cout << "Single model execution time: " << time_span.count() << " seconds";
+        std::cout << std::endl;
     }
+    
     return 0;
 }
