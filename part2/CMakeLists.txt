@@ -21,3 +21,11 @@ target_link_libraries (findlang)
 
 add_executable (locatelang locatelang.cpp)
 target_link_libraries (locatelang)
+
+add_executable (lang_model_test lang_model_test.cpp)
+target_link_libraries(lang_model_test)
+
+
+add_executable (multimodelfind multimodelfind.cpp)
+target_link_libraries(multimodelfind)
+
